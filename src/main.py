@@ -15,19 +15,19 @@ def get_device():
 
 device = get_device()
 
-images = ["cat", "astronaut", "coffee"]
-Ns = [256, 1024, 4096]
-for image in images:    
-    img = Image.open(f"./Gaussian Splatting/data/Images/{image}.png")
-    for N in Ns:
-        final = gs2D.optimize2D(img, N, N)
-        Image.fromarray(final).save(f"./Gaussian Splatting/data/Images/Results/gs_{N}_{N}_{image}.png")
+# images = ["cat", "astronaut", "coffee"]
+# Ns = [256, 1024, 4096]
+# for image in images:    
+#     img = Image.open(f"./Gaussian Splatting/data/Images/{image}.png")
+#     for N in Ns:
+#         final = gs2D.optimize2D(img, N, N)
+#         Image.fromarray(final).save(f"./Gaussian Splatting/data/Images/Results/gs_{N}_{N}_{image}.png")
 
-print("densify test:")
-N = 1024
-img = Image.open(f"./Gaussian Splatting/data/Images/cat.png")
-final = gs2D.optimize2D(img, 256, 1024)
-Image.fromarray(final).save(f"./Gaussian Splatting/data/Images/Results/gs_256_1024_cat.png")
+# print("densify test:")
+# N = 1024
+# img = Image.open(f"./Gaussian Splatting/data/Images/cat.png")
+# final = gs2D.optimize2D(img, 256, 1024)
+# Image.fromarray(final).save(f"./Gaussian Splatting/data/Images/Results/gs_256_1024_cat.png")
 
 class Camera:
     def __init__(self, image, R, t, K, H, W, file, xy):

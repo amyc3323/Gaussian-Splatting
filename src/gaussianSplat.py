@@ -168,7 +168,7 @@ class GaussianSplat2D:
         depth_order = torch.arange(N, device=device)
         xy = GaussianSplat2D.pixel_grid(H, W, device)
 
-        for step in range(20):
+        for step in range(2000):
 
             Sigma = GaussianSplat2D.covariance_2d(log_s.exp(), theta)
             img = GaussianSplat2D.render_tiled(
@@ -201,9 +201,6 @@ class GaussianSplat2D:
                 color = color.detach().requires_grad_(True)
                 op_raw = op_raw.detach().requires_grad_(True)
                 opt = torch.optim.Adam([mu, log_s, theta, color, op_raw], lr=1e-2)
-            
-            psnr = -10 * torch.log10(loss)
-            print(f"PSNR: {psnr}")
 
         with torch.no_grad():
             Sigma = GaussianSplat2D.covariance_2d(log_s.exp(), theta)
@@ -475,10 +472,10 @@ class GaussianSplat3D:
         if (count >= max_count): return gaussians
 
         # grad_threshold = 2e-4         # densify Gaussian i if g_i > grad_threshold
-        densify_percent = 0.15
+        densify_percent = 0.1
         size_threshold = 0.06           # clone if max scale <= 2% of image width, else split
-        split_scale    = 1.6            # each split child gets (parent scale / split_scale)
-        prune_opacity  = 0.005          # remove Gaussian i if its opacity < this
+        split_scale    = 2            # each split child gets (parent scale / split_scale)
+        prune_opacity  = 0.02          # remove Gaussian i if its opacity < this
         
 
 
