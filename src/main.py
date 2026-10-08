@@ -4,7 +4,29 @@ from PIL import Image
 import json
 import torch
 import numpy as np
+import matplotlib.pyplot as plt
 
+# gaussians = [256, 1024, 4096]
+
+# cat_psnr = [27.22, 28.90, 33.86]
+# astronaut_psnr = [20.31, 24.29, 30.96]
+# coffee_psnr = [24.34, 28.45, 33.65]
+
+# plt.figure(figsize=(8, 5))
+
+# plt.plot(gaussians, cat_psnr, marker='o', label='Cat')
+# plt.plot(gaussians, coffee_psnr, marker='x', label='Coffee')
+# plt.plot(gaussians, astronaut_psnr, marker='*', label='Astronaut')
+
+# plt.xlabel('# Gaussians')
+# plt.ylabel('PSNR (dB)')
+# plt.title('PSNR vs. Number of Gaussians')
+# plt.xticks(gaussians)
+# plt.legend()
+# plt.grid(True)
+
+# plt.tight_layout()
+# plt.show()
 
 def get_device():
     if torch.cuda.is_available():
@@ -29,6 +51,7 @@ device = get_device()
 # final = gs2D.optimize2D(img, 256, 1024)
 # Image.fromarray(final).save(f"./Gaussian Splatting/data/Images/Results/gs_256_1024_cat.png")
 
+print("3D:")
 class Camera:
     def __init__(self, image, R, t, K, H, W, file, xy):
         self.image = image
@@ -79,11 +102,12 @@ for frame in data["val_frames"]:
 
 N = 2048
 budget = 4096
-final_imgs = gs3D.optimize3D(train_cameras, val_cameras, N, N)
+final_imgs = gs3D.optimize3D(train_cameras, val_cameras, N, budget)
 
 for res in final_imgs:
     image, file = res
-    filename = file.split("/")[-1]
-    number = filename.split(".")[0]
-    viewpoint = f"train_{int(number)}"
-    Image.fromarray(image).save(f"./Gaussian Splatting/data/Images/Results/sphere_gs_{N}_{budget}_viewpoint_{viewpoint}.png")
+    filename = file.split("/")
+    number = filename[-1].split(".")[0]
+    type = filename[0]
+    viewpoint = f"{type}_{int(number)}"
+    Image.fromarray(image).save(f"./Gaussian Splatting/data/Images/Results/sphere_gs_{N}_{budget}_{viewpoint}.png")

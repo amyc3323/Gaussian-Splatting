@@ -417,6 +417,7 @@ class GaussianSplat3D:
 
         with torch.no_grad():
             all_cameras = train_cameras + valid_cameras
+            
             final_imgs = []
 
             for cam in all_cameras:
@@ -449,18 +450,23 @@ class GaussianSplat3D:
         return (mu3, log_s, theta, color, op_raw)
 
     def split(gaussians, i, split_scale):
-        mu3, log_s, theta, color, op_raw = gaussians
-        new_log_s = log_s.clone()
-        new_log_s[i] = new_log_s[i] - torch.log(torch.tensor(split_scale, device=log_s.device))
+        mu3, log_s, quat, color, op_raw = gaussians
 
         scale = log_s[i].exp()
         offset = torch.randn(3, device=mu3.device) * scale
-        new_mu3 = torch.cat([mu3, mu3[i:i+1] + offset], dim=0)
-        log_s = torch.cat([log_s, log_s[i:i+1]], dim=0)
-        theta = torch.cat([theta, theta[i:i+1]], dim=0)
+
+        child_mu3 = mu3[i:i+1] + offset
+        child_log_s = log_s[i:i+1] - torch.log(
+            torch.tensor(split_scale, device=log_s.device)
+        )
+
+        mu3 = torch.cat([mu3, child_mu3], dim=0)
+        log_s = torch.cat([log_s, child_log_s], dim=0)
+        quat = torch.cat([quat, quat[i:i+1]], dim=0)
         color = torch.cat([color, color[i:i+1]], dim=0)
         op_raw = torch.cat([op_raw, op_raw[i:i+1]], dim=0)
-        return (new_mu3, log_s, theta, color, op_raw)
+
+        return (mu3, log_s, quat, color, op_raw)
 
 
     # run inside the P3 training loop, every densify_every steps
